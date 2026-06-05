@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>E-shop Minerály & Ezoterika | Iglovik</title>
+
+<style>
+/* ==========================================================================
+   1. GLOBÁLNE NASTAVENIA, RESETY A POZADIE
+   ========================================================================== */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    transition: all 0.25s ease-in-out;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    padding: 160px 15px 40px 15px;
+    background: radial-gradient(circle at top right, #1e293b, #0f172a);
+    background-attachment: fixed;
+    font-family: 'Segoe UI', Roboto, -apple-system, sans-serif;
+    color: #f8fafc;
+    min-height: 100vh;
+    line-height: 1.5;
+}
+
+h1, h2, h3, h4 {
+    color: #ffffff;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+}
+
+h1 {
+    text-align: center;
+    font-size: 2.5rem;
+    margin: 10px 0 20px 0;
+    text-shadow: 0 0 20px rgba(52, 152, 219, 0.25);
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+@media(min-width: 992px) {
+    .container {
+        flex-direction: row;
+        align-items: flex-start;
+    }
+}
+
+/* ==========================================================================
+   2. MATNÝ SKLENENÝ EFEKT (GLASSMORPHISM CORE)
+   ========================================================================== */
+.glass-panel {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05), 0 8px 32px 0 rgba(0, 0, 0, 0.35);
+}
+
+/* ==========================================================================
+   3. MODERNÉ FIXNÉ MENU (NAVBAR) & KATEGÓRIE
+   ========================================================================== */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1500;
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 20px;
+    gap: 10px;
+}
+
+.nav-links {
+    display: flex;
+    gap: 25px;
+    list-style: none;
+}
+
+.nav-links a {
+    color: #cbd5e1;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 6px 14px;
+    border-radius: 20px;
+}
+
+.nav-links a:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.category-switcher {
+    display: flex;
+    gap: 10px;
+    background: rgba(0,0,0,0.3);
+    padding: 4px;
+    border-radius: 30px;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.category-btn {
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    padding: 8px 20px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    border-radius: 20px;
+    cursor: pointer;
+    margin: 0;
+    width: auto;
+}
+.category-btn::after { display: none; }
+
+.category-btn.active {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+}
+
+.category-btn.active.eso-theme {
+    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+    box-shadow: 0 4px 12px rgba(155, 89, 182, 0.3);
+}
+
+/* ==========================================================================
+   4. FILTRE
+   ========================================================================== */
+.filters-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin: 0 auto 30px auto;
+    max-width: 700px;
+    padding: 8px;
+    border-radius: 16px;
+}
+
+.filter-select {
+    flex: 1;
+    min-width: 160px;
+    padding: 12px 20px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 16px;
+    padding-right: 45px;
+}
+
+.filter-select:focus {
+    border-color: rgba(52, 152, 219, 0.5);
+    box-shadow: 0 0 12px rgba(52, 152, 219, 0.2);
+}
+
+.filter-select option {
+    background: #1e293b;
+    color: #ffffff;
+    padding: 10px;
+}
+
+/* ==========================================================================
+   5. KARTY PRODUKTOV
+   ========================================================================== */
+.shop {
+    flex: 3;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 25px;
+}
+
+.card {
+    padding: 20px;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -150%;
+    width: 50%; height: 100%;
+    background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.08) 100%);
+    transform: skewX(-25deg);
+}
+
+.card:hover::before {
+    left: 150%;
+    transition: all 0.7s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 12px 40px 0 rgba(0, 0, 0, 0.5);
+}
+
+.item-code {
+    background: rgba(255, 255, 255, 0.08);
+    color: #94a3b8;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.75rem;
+    display: inline-block;
+    margin-bottom: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    align-self: flex-start;
+}
+
+.img-container-box {
+    width: 100%;
+    height: 220px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.main-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.img-container-box:hover .main-img {
+    transform: scale(1.04);
+}
+
+.thumbs {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    margin-top: 10px;
+    padding-bottom: 6px;
+}
+.thumbs::-webkit-scrollbar { height: 4px; }
+.thumbs::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
+
+.thumbs img {
+    width: 52px; height: 52px; object-fit: cover; border-radius: 6px;
+    cursor: pointer; border: 2px solid transparent; background: rgba(0,0,0,0.2);
+}
+.thumbs img:hover { border-color: #3498db; transform: scale(1.05); }
+
+.card h3 { margin: 12px 0 2px 0; font-size: 1.25rem; }
+.card-en-title { font-style: italic; color: #94a3b8; font-size: 0.85rem; margin-bottom: 10px; }
+.card-detail { margin: 4px 0; font-size: 0.9rem; color: #cbd5e1; }
+.card-detail strong { color: #94a3b8; }
+
+.eso-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin: 4px 4px 4px 0;
+}
+.tag-zodiac { background: rgba(155, 89, 182, 0.15); color: #d7aefb; border: 1px solid rgba(155, 89, 182, 0.3); }
+.tag-effect { background: rgba(230, 126, 34, 0.15); color: #ffeb9c; border: 1px solid rgba(230, 126, 34, 0.3); }
+
+.eso-description-box {
+    margin-top: 8px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 6px;
+    padding: 8px;
+    font-size: 0.85rem;
+    color: #cbd5e1;
+    border-left: 3px solid #9b59b6;
+}
+
+.price { font-size: 1.4rem; font-weight: 800; color: #2ecc71; margin: 12px 0 4px 0; text-shadow: 0 0 10px rgba(46, 204, 113, 0.15); }
+
+/* ==========================================================================
+   6. TLAČIDLÁ
+   ========================================================================== */
+button {
+    width: 100%; padding: 12px; border: 1px solid rgba(255, 255, 255, 0.1);
+    background: linear-gradient(135deg, #3498db, #2980b9); color: white;
+    border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 0.95rem;
+    margin-top: 12px; box-shadow: 0 4px 15px rgba(52, 152, 219, 0.25); position: relative; overflow: hidden;
+}
+button::after {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 50%;
+    background: linear-gradient(rgba(255,255,255,0.12), rgba(255,255,255,0));
+}
+button:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(52, 152, 219, 0.35); }
+button:active { transform: translateY(1px); }
+.remove { background: linear-gradient(135deg, #e74c3c, #c0392b); box-shadow: 0 4px 15px rgba(231, 76, 60, 0.25); }
+.remove:hover { box-shadow: 0 6px 20px rgba(231, 76, 60, 0.35); }
+
+/* ==========================================================================
+   7. KOŠÍK A FORMULÁR
+   ========================================================================== */
+.cart {
+    flex: 1; padding: 25px; border-radius: 16px; position: sticky; top: 150px;
+}
+.cart h2 { margin-top: 0; font-size: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px; }
+.cart-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding: 12px 0; font-size: 0.95rem; }
+.cart-item button { width: auto; padding: 4px 10px; background: linear-gradient(135deg, #e74c3c, #c0392b); margin-top: 0; font-size: 0.8rem; }
+.cart-total { font-size: 1rem; margin: 12px 0; display: flex; justify-content: space-between; color: #cbd5e1; }
+.grand-total { font-size: 1.4rem; font-weight: 800; color: #2ecc71; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; margin-top: 15px; }
+
+.shipping-section { margin: 20px 0; padding: 15px; background: rgba(0, 0, 0, 0.15); border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.04); }
+.shipping-section h4 { margin: 0 0 12px 0; font-size: 1rem; }
+.shipping-option { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 0.95rem; cursor: pointer; }
+.shipping-option input[type="radio"] { accent-color: #3498db; transform: scale(1.1); }
+
+.order-form h3 { margin-top: 25px; font-size: 1.2rem; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 15px; }
+.order-form label { font-size: 0.85rem; color: #94a3b8; display: block; margin-top: 12px; }
+.order-form input {
+    width: 100%; padding: 12px; margin: 6px 0 12px 0; box-sizing: border-box;
+    background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; font-size: 0.95rem; color: white;
+}
+.order-form input:focus { outline: none; border-color: #3498db; box-shadow: 0 0 10px rgba(52, 152, 219, 0.25); background: rgba(0, 0, 0, 0.3); }
+
+.loading {
+    text-align: center; font-size: 1.1rem; font-weight: 600; padding: 14px; color: #f39c12;
+    background: rgba(243, 156, 18, 0.08); border: 1px solid rgba(243, 156, 18, 0.15); border-radius: 8px; margin-bottom: 25px; backdrop-filter: blur(5px);
+}
+
+/* ==========================================================================
+   8. EXTERNE SEKCIE
+   ========================================================================== */
+.section-block { max-width: 1400px; margin: 50px auto 0 auto; padding: 30px; border-radius: 16px; text-align: center; }
+.section-block h2 { font-size: 1.8rem; margin-bottom: 15px; position: relative; display: inline-block; }
+.section-block h2::after { content: ''; display: block; width: 50%; height: 3px; background: #3498db; margin: 8px auto 0 auto; border-radius: 2px; }
+.section-block p { color: #cbd5e1; font-size: 1.1rem; margin-bottom: 20px; }
+
+.gallery-link {
+    display: inline-flex; align-items: center; gap: 10px; padding: 14px 28px;
+    background: linear-gradient(135deg, #3498db, #2980b9); color: white; text-decoration: none;
+    font-weight: 700; border-radius: 10px; box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+}
+.gallery-link:hover { filter: brightness(1.1); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(52, 152, 219, 0.45); }
+
+.contact-grid { display: flex; flex-direction: column; gap: 15px; align-items: center; margin-top: 20px; }
+.contact-item-info { font-size: 1.2rem; color: #ffffff; font-weight: 600; }
+.contact-link { color: #3498db; text-decoration: none; font-weight: 700; border-bottom: 1px dashed #3498db; padding-bottom: 2px; }
+.contact-link:hover { color: #2ecc71; border-color: #2ecc71; }
+
+/* ==========================================================================
+   9. MODULY (FLOATING CART & LIGHTBOX)
+   ========================================================================== */
+.floating-cart {
+    position: fixed; bottom: 25px; right: 25px; background: linear-gradient(135deg, #2ecc71, #27ae60);
+    color: white; width: 62px; height: 62px; border-radius: 50%; box-shadow: 0 8px 25px rgba(46, 204, 113, 0.35);
+    display: none; align-items: center; justify-content: center; z-index: 999; cursor: pointer; font-size: 1.5rem; border: 1px solid rgba(255,255,255,0.15);
+}
+.floating-cart:hover { transform: scale(1.08); }
+.cart-badge { position: absolute; top: -2px; right: -2px; background: #e74c3c; color: white; border-radius: 50%; padding: 3px 8px; font-size: 0.75rem; font-weight: bold; border: 1.5px solid white; }
+
+.lightbox {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); display: none; align-items: center; justify-content: center; z-index: 2000; opacity: 0;
+}
+.lightbox.open { opacity: 1; }
+.lightbox-content-wrapper { position: relative; max-width: 90%; max-height: 85%; display: flex; justify-content: center; align-items: center; }
+.lightbox-img { max-width: 100%; max-height: 80vh; border-radius: 12px; object-fit: contain; box-shadow: 0 20px 50px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.08); }
+.lightbox-close { position: absolute; top: -55px; right: 0; color: white; font-size: 44px; font-weight: 300; cursor: pointer; }
+.lightbox-close:hover { color: #e74c3c; }
+</style>
+</head>
+
+<body>
+
+<nav class="navbar">
+    <ul class="nav-links">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#galeria">Galéria</a></li>
+        <li><a href="#kontakt">Kontakt</a></li>
+    </ul>
+    
+    <div class="category-switcher">
+        <button id="btn-cat-minerals" class="category-btn active" onclick="switchCategory('mineraly')">💎 Minerály</button>
+        <button id="btn-cat-eso" class="category-btn" onclick="switchCategory('ezoterika')">🔮 Ezoterika</button>
+    </div>
+</nav>
+
+<div id="home"></div>
+
+<h1>E-shop Minerály</h1>
+
+<div class="filters-wrapper glass-panel" id="filters-container"></div>
+
+<div id="loading" class="loading" style="display: block;">Načítavam ponuku e-shopu...</div>
+
+<div class="container">
+    <div class="shop" id="shop"></div>
+
+    <div class="cart glass-panel" id="cart-section">
+        <h2>Nákupný košík</h2>
+        <div id="cart-items">
+            <p style="color:#94a3b8;">Košík je prázdny</p>
+        </div>
+        
+        <div class="shipping-section" id="shipping-container" style="display:none;">
+            <h4>Možnosti dopravy</h4>
+            <label class="shipping-option">
+                <input type="radio" name="shipping" value="zbox" checked onchange="updateCart()">
+                <span>Packeta - Z-Box (3.30 €)</span>
+            </label>
+            <label class="shipping-option">
+                <input type="radio" name="shipping" value="adresa" onchange="updateCart()">
+                <span>Packeta - Na adresu (4.90 €)</span>
+            </label>
+        </div>
+
+        <div class="cart-total">
+            <span>Položky:</span>
+            <span id="cart-items-price">0.00 €</span>
+        </div>
+        <div class="cart-total">
+            <span>Doprava:</span>
+            <span id="cart-shipping-price">0.00 €</span>
+        </div>
+        <div class="cart-total grand-total">
+            <span>Celkom k úhrade:</span>
+            <span id="cart-grand-total">0.00 €</span>
+        </div>
+        
+        <div class="order-form" id="order-form-container" style="display:none;">
+            <h3>Údaje pre objednávku</h3>
+            
+            <label>Meno a Priezvisko:</label>
+            <input type="text" id="cust-meno" required placeholder="Ján Horvát">
+            
+            <label>Váš Email:</label>
+            <input type="email" id="cust-email" required placeholder="jan.horvat@gmail.com">
+            
+            <label>Telefónne číslo:</label>
+            <input type="tel" id="cust-telefon" value="+421 " required placeholder="+421 900 123 456">
+            
+            <label id="label-adresa">Názov alebo adresa Z-Boxu:</label>
+            <input type="text" id="cust-adresa" required placeholder="Napr. Z-BOX, Hlavná 12, Bratislava">
+            
+            <button id="submit-btn" onclick="submitOrder()" style="background: linear-gradient(135deg, #2ecc71, #27ae60); box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);">Záväzne objednať</button>
+        </div>
+    </div>
+</div>
+
+<div id="galeria" class="section-block glass-panel">
+    <h2>Galéria</h2>
+    <p>Tu si môžete pozrieť fotky v plnom rozlíšení.</p>
+    <a href="https://postimg.cc/gallery/B3z84Rg" target="_blank" class="gallery-link">
+        🖼️ Otvoriť externú galériu
+    </a>
+</div>
+
+<div id="kontakt" class="section-block glass-panel" style="margin-bottom: 40px;">
+    <h2>Kontakt</h2>
+    <div class="contact-grid">
+        <div class="contact-item-info">👤 Osoba: Erik Antony</div>
+        <div class="contact-item-info">📞 Telefón: <a href="tel:+421948044594" class="contact-link">+421 948 044 594</a></div>
+        <div class="contact-item-info">✉️ E-mail: <a href="mailto:to.erik.antony@gmail.com" class="contact-link">to.erik.antony@gmail.com</a></div>
+    </div>
+</div>
+
+<div class="floating-cart" id="floating-cart" onclick="scrollToCart()">
+    🛒 <span class="cart-badge" id="floating-badge">0</span>
+</div>
+
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <div class="lightbox-content-wrapper" onclick="event.stopPropagation();">
+        <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+        <img class="lightbox-img" id="lightbox-img" src="">
+    </div>
+</div>
+
+<script>
+const URL = "https://script.google.com/macros/s/AKfycbymHw7u0FPDxpd64Cm9PjEnRqgki3c7OnRMx3Xz0i70bAb2QrJNSdOuXTCTwk3vcunYOQ/exec";
+
+const CENA_ZBOX = 3.30;
+const CENA_ADRESA = 4.90;
+
+let allProducts = []; 
+let cart = [];
+let currentCategory = "mineraly";
+
+let selectedLetter = "Všetky";
+let selectedZodiac = "Všetky";
+let selectedEffect = "Všetky";
+
+// Funkcia na odstránenie diakritiky (rieši slovenské názvy stĺpcov)
+function removeAccents(str) {
+    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
+fetch(URL)
+.then(r => r.json())
+.then(data => {
+    document.getElementById('loading').style.display = 'none';
+    
+    let rows = [];
+    if (Array.isArray(data)) {
+        if (data.length > 0 && Array.isArray(data[0])) {
+            // Prečistenie hlavičiek na malé písmená bez diakritiky (napr. Kupujúci -> kupujuci)
+            const headers = data[0].map(h => removeAccents(String(h).toLowerCase().trim()));
+            for(let i = 1; i < data.length; i++) {
+                let rowObj = {};
+                data[i].forEach((val, idx) => { 
+                    if(headers[idx]) rowObj[headers[idx]] = val; 
+                });
+                rows.push(rowObj);
+            }
+        } else {
+            rows = data;
+        }
+    } else {
+        rows = Object.values(data || {});
+    }
+
+    const map = new Map();
+
+    rows.forEach(r => {
+        const id = String(r.id ?? "").trim();
+        if(!id) return;
+
+        // Filtrovanie predaných vecí
+        if (r.status && removeAccents(String(r.status).toLowerCase().trim()) === "predane") return;
+
+        // Detekcia kategórie (Akceptuje "ezoterika", "ezo" - malé aj veľké písmená)
+        let kat = "mineraly"; 
+        const typHodnota = removeAccents(String(r.typ ?? "").toLowerCase().trim());
+        if(typHodnota === "ezoterika" || typHodnota === "ezo") {
+            kat = "ezoterika";
+        }
+
+        if(!map.has(id)){
+            map.set(id, {
+                id: id,
+                kategoria: kat,
+                nazov: r.nazov ?? "",
+                nazovEn: r.nazoven ?? "",
+                nalezisko: r.nalezisko ?? "",
+                stat: r.stat ?? "",
+                rozmery: r.rozmery ?? "",
+                cena: Number(r.cena ?? 0),
+                obrazky: [],
+                ucinky: r.ucinky ?? "", 
+                zverokruh: r.zverokruh ?? "",
+                popis: r.popis ?? ""
+            });
+        }
+
+        const imgVal = r.obrazok;
+        if(imgVal){
+            const splitImgs = String(imgVal).split(",");
+            splitImgs.forEach(imgUrl => {
+                if(imgUrl.trim()) map.get(id).obrazky.push(imgUrl.trim());
+            });
+        }
+    });
+
+    allProducts = [...map.values()];
+    allProducts.sort((a, b) => a.nazov.localeCompare(b.nazov, 'sk'));
+    
+    buildFilters();
+    render();
+})
+.catch(err => {
+    document.getElementById('loading').innerText = "Kritická chyba pri spracovaní dát.";
+    console.error(err);
+});
+
+function switchCategory(cat) {
+    currentCategory = cat;
+    selectedLetter = "Všetky";
+    selectedZodiac = "Všetky";
+    selectedEffect = "Všetky";
+
+    document.getElementById('btn-cat-minerals').classList.toggle('active', cat === 'mineraly');
+    document.getElementById('btn-cat-eso').classList.toggle('active', cat === 'ezoterika');
+    document.getElementById('btn-cat-eso').classList.toggle('eso-theme', cat === 'ezoterika');
+
+    buildFilters();
+    render();
+}
+
+function buildFilters() {
+    const container = document.getElementById("filters-container");
+    const activeProducts = allProducts.filter(p => p.kategoria === currentCategory);
+
+    if (currentCategory === "mineraly") {
+        const letters = new Set();
+        activeProducts.forEach(p => { if(p.nazov) letters.add(p.nazov.charAt(0).toUpperCase()); });
+        const sortedLetters = [...letters].sort((a, b) => a.localeCompare(b, 'sk'));
+        sortedLetters.unshift("Všetky");
+
+        container.innerHTML = `
+            <select class="filter-select" onchange="filterMinerals(this.value)">
+                ${sortedLetters.map(l => `
+                    <option value="${l}" ${l === selectedLetter ? 'selected' : ''}>
+                        ${l === "Všetky" ? "🔍 Všetky minerály" : `Písmeno: ${l}`}
+                    </option>
+                `).join("")}
+            </select>
+        `;
+    } else {
+        const zodiacs = new Set();
+        const effects = new Set();
+
+        activeProducts.forEach(p => {
+            if(p.zverokruh) p.zverokruh.split(",").forEach(z => zodiacs.add(z.trim()));
+            if(p.ucinky) p.ucinky.split(",").forEach(e => effects.add(e.trim()));
+        });
+
+        const sortedZodiacs = [...zodiacs].sort((a, b) => a.localeCompare(b, 'sk'));
+        sortedZodiacs.unshift("Všetky");
+
+        const sortedEffects = [...effects].sort((a, b) => a.localeCompare(b, 'sk'));
+        sortedEffects.unshift("Všetky");
+
+        container.innerHTML = `
+            <select class="filter-select" onchange="filterEso('zodiac', this.value)">
+                <option value="Všetky">🌟 Všetky znamenia zverokruhu</option>
+                ${sortedZodiacs.filter(z => z !== "Všetky" && z !== "").map(z => `
+                    <option value="${z}" ${z === selectedZodiac ? 'selected' : ''}>Znamenie: ${z}</option>
+                `).join("")}
+            </select>
+
+            <select class="filter-select" onchange="filterEso('effect', this.value)">
+                <option value="Všetky">✨ Všetky magické účinky</option>
+                ${sortedEffects.filter(e => e !== "Všetky" && e !== "").map(e => `
+                    <option value="${e}" ${e === selectedEffect ? 'selected' : ''}>Účinok: ${e}</option>
+                `).join("")}
+            </select>
+        `;
+    }
+}
+
+function filterMinerals(letter) { selectedLetter = letter; render(); }
+function filterEso(type, value) {
+    if(type === 'zodiac') selectedZodiac = value;
+    if(type === 'effect') selectedEffect = value;
+    render();
+}
+
+function render(){
+    const box = document.getElementById("shop");
+    box.innerHTML = "";
+
+    let filtered = allProducts.filter(p => p.kategoria === currentCategory);
+
+    if (currentCategory === "mineraly") {
+        if (selectedLetter !== "Všetky") {
+            filtered = filtered.filter(p => p.nazov && p.nazov.charAt(0).toUpperCase() === selectedLetter);
+        }
+    } else {
+        if (selectedZodiac !== "Všetky") {
+            filtered = filtered.filter(p => p.zverokruh && p.zverokruh.includes(selectedZodiac));
+        }
+        if (selectedEffect !== "Všetky") {
+            filtered = filtered.filter(p => p.ucinky && p.ucinky.includes(selectedEffect));
+        }
+    }
+
+    if(filtered.length === 0) {
+        box.innerHTML = "<p style='padding:20px; color: #94a3b8; text-align:center; width:100%;'>Pre vybrané kritériá sa nenašli žiadne položky.</p>";
+        return;
+    }
+
+    filtered.forEach(p
