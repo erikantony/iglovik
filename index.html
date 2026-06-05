@@ -414,7 +414,7 @@ button:active { transform: translateY(1px); }
 
 <div id="home"></div>
 
-<h1>E-shop Minerály</h1>
+<h1 id="shop-title">E-shop Minerály</h1>
 
 <div class="filters-wrapper glass-panel" id="filters-container"></div>
 
@@ -516,7 +516,7 @@ let selectedLetter = "Všetky";
 let selectedZodiac = "Všetky";
 let selectedEffect = "Všetky";
 
-// Funkcia na odstránenie diakritiky (rieši slovenské názvy stĺpcov)
+// Funkcia na odstránenie diakritiky
 function removeAccents(str) {
     return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
@@ -529,7 +529,6 @@ fetch(URL)
     let rows = [];
     if (Array.isArray(data)) {
         if (data.length > 0 && Array.isArray(data[0])) {
-            // Prečistenie hlavičiek na malé písmená bez diakritiky (napr. Kupujúci -> kupujuci)
             const headers = data[0].map(h => removeAccents(String(h).toLowerCase().trim()));
             for(let i = 1; i < data.length; i++) {
                 let rowObj = {};
@@ -554,7 +553,7 @@ fetch(URL)
         // Filtrovanie predaných vecí
         if (r.status && removeAccents(String(r.status).toLowerCase().trim()) === "predane") return;
 
-        // Detekcia kategórie (Akceptuje "ezoterika", "ezo" - malé aj veľké písmená)
+        // Detekcia kategórie
         let kat = "mineraly"; 
         const typHodnota = removeAccents(String(r.typ ?? "").toLowerCase().trim());
         if(typHodnota === "ezoterika" || typHodnota === "ezo") {
@@ -578,11 +577,15 @@ fetch(URL)
             });
         }
 
+        // Pospájanie viacerých obrázkov z riadkov tabuľky pre rovnaké ID
         const imgVal = r.obrazok;
         if(imgVal){
             const splitImgs = String(imgVal).split(",");
             splitImgs.forEach(imgUrl => {
-                if(imgUrl.trim()) map.get(id).obrazky.push(imgUrl.trim());
+                const cleanUrl = imgUrl.trim();
+                if(cleanUrl && !map.get(id).obrazky.includes(cleanUrl)) {
+                    map.get(id).obrazky.push(cleanUrl);
+                }
             });
         }
     });
@@ -604,6 +607,7 @@ function switchCategory(cat) {
     selectedZodiac = "Všetky";
     selectedEffect = "Všetky";
 
+    document.getElementById('shop-title').innerText = cat === 'mineraly' ? 'E-shop Minerály' : 'E-shop Ezoterika';
     document.getElementById('btn-cat-minerals').classList.toggle('active', cat === 'mineraly');
     document.getElementById('btn-cat-eso').classList.toggle('active', cat === 'ezoterika');
     document.getElementById('btn-cat-eso').classList.toggle('eso-theme', cat === 'ezoterika');
@@ -683,16 +687,4 @@ function render(){
         }
     } else {
         if (selectedZodiac !== "Všetky") {
-            filtered = filtered.filter(p => p.zverokruh && p.zverokruh.includes(selectedZodiac));
-        }
-        if (selectedEffect !== "Všetky") {
-            filtered = filtered.filter(p => p.ucinky && p.ucinky.includes(selectedEffect));
-        }
-    }
-
-    if(filtered.length === 0) {
-        box.innerHTML = "<p style='padding:20px; color: #94a3b8; text-align:center; width:100%;'>Pre vybrané kritériá sa nenašli žiadne položky.</p>";
-        return;
-    }
-
-    filtered.forEach(p
+            filtered = filtered.filter(p => p.zverokruh && p.zverokruh
